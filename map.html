@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Find a way to join Yggdrasil network!</title>
+
+	<link rel="stylesheet" href="leaflet.css"/>
+	<script src="leaflet.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="screen.css" />
+
+	<link rel="stylesheet" href="MarkerCluster.css" />
+	<link rel="stylesheet" href="MarkerCluster.Default.css" />
+	<script src="leaflet.markercluster.js"></script>
+</head>
+<body>
+
+	<div id="map"></div>
+	<span>Mouse over a cluster to see the bounds of its children and click a cluster to zoom to those bounds</span>
+	<script type="text/javascript">
+
+		var tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				maxZoom: 18,
+				attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Points &copy 2019 Yggdrasil-network'
+			}),
+			latlng = L.latLng(55.753215, 37.622504);
+
+		var map = L.map('map', {center: latlng, zoom: 9, layers: [tiles]});
+
+		var markers = L.markerClusterGroup();
+		
+		fetch('nodes.json').then(response => response.json()).then(
+		nodes => {
+			for (let [key, value] of Object.entries(nodes)) {
+				var title = value.physical.SSID;
+				var coord = value.physical.coord.split(', ');
+				var lastseen = new Date(value.lastseen * 1000);
+				var marker = L.marker(new L.LatLng(coord[0], coord[1]), { title: title });
+				var label = 'SSID: ' + value.physical.SSID + '<br \/>';
+				if (value.physical.hasOwnProperty('password') & value.physical.password !== '') {
+				   label = label + 'Password: "'+value.physical.password+'"<br \/>';
+				}
+				if (value.physical.hasOwnProperty('mode') & value.physical.mode !== '') {
+				   label = label + value.physical.mode+'<br \/>';
+				   //TODO: сделать поподробнее
+				}
+				if (value.physical.hasOwnProperty('exconninfo') & value.physical.exconninfo !== '') {
+				   label = label + value.physical.exconninfo + '<br \/>';
+				}
+				label = label +'<br \/>' + value.physical.description + '<br \/>' +'Last seen: '+ lastseen;
+				if (value.hasOwnProperty('contact') & value.contact !== '') {
+					//TODO: распарсить формы контакта
+				   label = label +'<br \/>Contact: ' + value.contact;
+				}
+				marker.bindPopup(label);
+				markers.addLayer(marker);
+			}
+		}
+		)
+		map.addLayer(markers);
+	</script>
+</body>
+</html>

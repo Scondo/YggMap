@@ -1,0 +1,14 @@
+{
+  "163d3e0ae0dc514b9bc0d8701a0cee1fcba4939a7923a9095dcf9031e46f3e71": {
+    "contact": "",
+    "lastseen": 1574273277.7974362,
+    "physical": {
+      "SSID": "YGG",
+      "coord": "55.753215, 37.622504",
+      "description": "demo \u043f\u043e\u0441\u0440\u0435\u0434\u0438 \u041a\u0440\u0430\u0441\u043d\u043e\u0439 \u041f\u043b\u043e\u0449\u0430\u0434\u0438 \u043e\u0440\u0438\u0435\u043d\u0442\u0438\u0440\u043e\u0432\u0430\u0442\u044c\u0441\u044f \u043d\u0430 \u043c\u0430\u0432\u0437\u043e\u043b\u0435\u0439",
+      "exconninfo": "channel 14, Hidden SSID",
+      "mode": "AP",
+      "password": "12345678"
+    }
+  }
+}
