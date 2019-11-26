@@ -3,7 +3,7 @@ Created on 20 нояб. 2019 г.
 
 @author: scond
 '''
-from simplecrawler import getrecursive
+from simplecrawler import getnodesinfo, getnodesrec
 import json
 import time
 
@@ -13,7 +13,7 @@ try:
     keptnodes = json.load(open("nodes.json", 'r'))
 except FileNotFoundError:
     keptnodes = {}
-allnodes = getrecursive()
+allnodes = getnodesinfo(getnodesrec())
 freshnodes = {}
 for k, v in allnodes:
     if (v is not None and 'physical' in v and

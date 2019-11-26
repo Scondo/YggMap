@@ -1,8 +1,9 @@
-#!/usr/local/bin/python3.6
+#!/usr/bin/env python3
 # encoding: utf-8
 import socket
 import json
 import argparse
+import logging
 
 
 class Error(Exception):
@@ -23,38 +24,45 @@ def doRequest(req):
     return data.get('response')
 
 
-def getrecursive(pubkey=None, coords=None, skip=set()):
+def getnodesrec(pubkey=None, coords=None, skip=set()):
     if pubkey is None:
         node = list(doRequest({"request": "getself"})['self'].values())[0]
         pubkey = node['box_pub_key']
         coords = node['coords']
+        yield (pubkey, coords)
     if pubkey not in skip:
-        print (pubkey, coords, len(skip))
-        try:
-            info = doRequest({"request": "getNodeInfo",
-                              "box_pub_key": pubkey, "coords": coords})
-            yield (pubkey, info.get('nodeinfo'))
-        except Error:
-            yield (pubkey, {})
-
+        skip.add(pubkey)
+        logging.info((pubkey, coords, len(skip)))
         try:
             dht = doRequest({"request": "dhtPing",
                              "box_pub_key": pubkey, "coords": coords})
             for node in dht['nodes'].values():
-                res0 = getrecursive(node['box_pub_key'], node['coords'],
-                                    skip)
-                for (k, v) in res0:
-                    yield (k, v)
+                for (k, c) in getnodesrec(node['box_pub_key'], node['coords'],
+                                          skip):
+                    yield (k, c)
                     skip.add(k)
         except Error:
             pass
 
 
+def getnodesinfo(nodes):
+    for k, c in nodes:
+        try:
+            info = doRequest({"request": "getNodeInfo",
+                              "box_pub_key": k, "coords": c})
+            yield (k, info.get('nodeinfo'))
+        except Error:
+            yield (k, {})
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Get nodeinfo from all nodes')
     parser.add_argument('target', type=argparse.FileType('w'), nargs=1)
+    parser.add_argument('-v', action='store_true')
     p = parser.parse_args()
+    if p.v:
+        logging.basicConfig(level=logging.INFO)
     try:
-        allnodes = {k: v for (k, v) in getrecursive()}
+        allnodes = {k: v for (k, v) in getnodesinfo(getnodesrec())}
     finally:
         json.dump(allnodes, p.target[0], sort_keys=True, indent=2)
