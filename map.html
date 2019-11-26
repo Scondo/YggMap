@@ -40,16 +40,21 @@
 				   label = label + 'Password: "'+value.physical.password+'"<br \/>';
 				}
 				if (value.physical.hasOwnProperty('mode') & value.physical.mode !== '') {
-				   label = label + value.physical.mode+'<br \/>';
-				   //TODO: сделать поподробнее
+					 //TODO: сделать поподробнее
+					label = label + value.physical.mode+'<br \/>';
 				}
 				if (value.physical.hasOwnProperty('exconninfo') & value.physical.exconninfo !== '') {
 				   label = label + value.physical.exconninfo + '<br \/>';
 				}
 				label = label +'<br \/>' + value.physical.description + '<br \/>' +'Last seen: '+ lastseen;
 				if (value.hasOwnProperty('contact') & value.contact !== '') {
-					//TODO: распарсить формы контакта
-				   label = label +'<br \/>Contact: ' + value.contact;
+					if (typeof value.contact === "string"){
+						   label = label +'<br \/>Contact: ' + value.contact;
+					} 
+					if (typeof value.contact === "object" & value.contact.hasOwnProperty('email')){
+						   label = label +'<br \/>Contact: ' + value.contact.email;
+					}
+					// TODO: другие формы контакта? Несколько емейлов?
 				}
 				marker.bindPopup(label);
 				markers.addLayer(marker);
