@@ -36,16 +36,17 @@ def getnodesrec(pubkey=None, coords=None, skip=set()):
         node = list(doRequest({"request": "getself"})['self'].values())[0]
         pubkey = node['box_pub_key']
         coords = node['coords']
-        yield (pubkey, coords)
     if pubkey not in skip:
         skip.add(pubkey)
+        yield (pubkey, coords)
         logging.info((pubkey, coords, len(skip)))
         try:
             dht = doRequest({"request": "dhtPing",
                              "box_pub_key": pubkey, "coords": coords})
             for node in dht['nodes'].values():
-                for (k, c) in getnodesrec(node['box_pub_key'], node['coords'],
-                                          skip):
+                nodes = getnodesrec(node['box_pub_key'], node['coords'],
+                                          skip)
+                for (k, c) in nodes:
                     yield (k, c)
                     skip.add(k)
         except Error:
@@ -55,6 +56,7 @@ def getnodesrec(pubkey=None, coords=None, skip=set()):
 def getnodesinfo(nodes):
     for k, c in nodes:
         try:
+            logging.info((k, c))
             info = doRequest({"request": "getNodeInfo",
                               "box_pub_key": k, "coords": c})
             yield (k, info.get('nodeinfo'))
