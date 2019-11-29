@@ -15,12 +15,19 @@ class Error(Exception):
 
 
 def doRequest(req):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as ygg:
+    if hasattr(socket, 'AF_UNIX'):
+        ygg = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        ygg.connect('/var/run/yggdrasil.sock')
+    else:
+        ygg = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ygg.connect(('localhost', 9001))
+    try:
         ygg.send(json.dumps(req).encode())
         data = json.load(ygg.makefile(encoding='utf-8'))
-        if data['status'] == 'error':
-            raise Error(data.get('error'))
+    finally:
+        ygg.close()
+    if data['status'] == 'error':
+        raise Error(data.get('error'))
     return data.get('response')
 
 
