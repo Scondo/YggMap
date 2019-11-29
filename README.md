@@ -20,7 +20,7 @@ Map of nodes for yggdrasil-network
     "coord":"55.753215, 37.622504",
     "SSID":"YGG",
     "description":"demo посреди Красной Площади ориентироваться на мавзолей",
-    "mode":"AP",
+    "mode":"802.11s",
     "password":"12345678",
     "exconninfo":"channel 14, Hidden SSID"
  }
